@@ -1,0 +1,43 @@
+// Sentence composition (文の組み立て) practice.
+// Each entry has exactly 4 chunks in scrambled storage order. `correctOrder` is a
+// permutation of indices into `chunks` giving the grammatical sentence order.
+// `starSlot` is the 1-based position within `correctOrder` that the JLPT-style
+// question marks with a star (★) — i.e. the answer is chunks[correctOrder[starSlot-1]].
+const SENTENCE_COMP_DATA = [
+  { id:"sc001", chunks:["友達に", "本を", "もらった", "ことがあります"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"友達に　本を　もらった　ことがあります。", translation:"I have received a book from a friend before.", grammarId:"g007", tag:"experience" },
+  { id:"sc002", chunks:["雨が", "降っても", "出かけます", "私は"], correctOrder:[3,0,1,2], starSlot:2, fullSentence:"私は　雨が　降っても　出かけます。", translation:"Even if it rains, I will go out.", grammarId:"g031", tag:"conditional" },
+  { id:"sc003", chunks:["音楽を", "聞きながら", "勉強します", "私は"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"私は　音楽を　聞きながら　勉強します。", translation:"I study while listening to music.", grammarId:"g035", tag:"simultaneous" },
+  { id:"sc004", chunks:["早く", "起きれば", "間に合います", "会議に"], correctOrder:[0,1,3,2], starSlot:3, fullSentence:"早く　起きれば　会議に　間に合います。", translation:"If you wake up early, you'll make it in time for the meeting.", grammarId:"g027", tag:"conditional" },
+  { id:"sc005", chunks:["先生に", "漢字を", "教えて", "もらいました"], correctOrder:[0,1,2,3], starSlot:4, fullSentence:"先生に　漢字を　教えて　もらいました。", translation:"I had my teacher teach me kanji.", grammarId:"g056", tag:"giving/receiving" },
+  { id:"sc006", chunks:["友達が", "手伝って", "くれました", "引っ越しを"], correctOrder:[0,3,1,2], starSlot:2, fullSentence:"友達が　引っ越しを　手伝って　くれました。", translation:"My friend helped me with the move.", grammarId:"g055", tag:"giving/receiving" },
+  { id:"sc007", chunks:["この教科書は", "学生に", "使われています", "たくさんの"], correctOrder:[0,3,1,2], starSlot:3, fullSentence:"この教科書は　たくさんの　学生に　使われています。", translation:"This textbook is used by many students.", grammarId:"g057", tag:"passive" },
+  { id:"sc008", chunks:["先生は", "宿題を", "学生に", "させました"], correctOrder:[0,2,1,3], starSlot:2, fullSentence:"先生は　学生に　宿題を　させました。", translation:"The teacher made the students do homework.", grammarId:"g058", tag:"causative" },
+  { id:"sc009", chunks:["授業の", "前に", "本を", "読みました"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"授業の　前に　本を　読みました。", translation:"I read a book before class.", grammarId:"g039", tag:"time" },
+  { id:"sc010", chunks:["食事をした", "後で", "歯を", "磨きます"], correctOrder:[0,1,2,3], starSlot:1, fullSentence:"食事をした　後で　歯を　磨きます。", translation:"After eating, I brush my teeth.", grammarId:"g040", tag:"time" },
+  { id:"sc011", chunks:["子供が", "寝ている", "間に", "そうじをします"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"子供が　寝ている　間に　そうじをします。", translation:"I clean while the kids are sleeping.", grammarId:"g042", tag:"time" },
+  { id:"sc012", chunks:["彼女は", "私より", "ずっと", "早く走れます"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"彼女は　私より　ずっと　早く走れます。", translation:"She can run much faster than me.", grammarId:"g074", tag:"comparison" },
+  { id:"sc013", chunks:["赤い", "服の", "ほうが", "好きです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"赤い　服の　ほうが　好きです。", translation:"I like the red clothes better.", grammarId:"g075", tag:"comparison" },
+  { id:"sc014", chunks:["家族の", "中で", "兄が", "一番高いです"], correctOrder:[0,1,2,3], starSlot:4, fullSentence:"家族の　中で　兄が　一番高いです。", translation:"Among my family, my older brother is the tallest.", grammarId:"g076", tag:"comparison" },
+  { id:"sc015", chunks:["天気予報", "によると", "明日は", "雨です"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"天気予報によると　明日は　雨です。", translation:"According to the weather forecast, it will rain tomorrow.", grammarId:"g068", tag:"source" },
+  { id:"sc016", chunks:["彼は", "先生として", "学校で", "働いています"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"彼は　先生として　学校で　働いています。", translation:"He works as a teacher at a school.", grammarId:"g067", tag:"role" },
+  { id:"sc017", chunks:["日本の", "文化について", "調べています", "私は"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"私は　日本の　文化について　調べています。", translation:"I'm researching about Japanese culture.", grammarId:"g066", tag:"topic" },
+  { id:"sc018", chunks:["駅まで", "歩くのに", "十分", "かかります"], correctOrder:[0,2,1,3], starSlot:2, fullSentence:"駅まで　十分　歩くのに　かかります。", translation:"It takes ten minutes to walk to the station.", grammarId:"g072", tag:"quantity" },
+  { id:"sc019", chunks:["お金が", "少ししか", "ありません", "今は"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"今は　お金が　少ししか　ありません。", translation:"Right now I only have a little money.", grammarId:"g065", tag:"limiting" },
+  { id:"sc020", chunks:["日本語だけ", "話して", "ください", "ここでは"], correctOrder:[3,0,1,2], starSlot:2, fullSentence:"ここでは　日本語だけ　話して　ください。", translation:"Please speak only Japanese here.", grammarId:"g064", tag:"limiting" },
+  { id:"sc021", chunks:["この", "問題は", "とても", "複雑です"], correctOrder:[0,1,2,3], starSlot:4, fullSentence:"この　問題は　とても　複雑です。", translation:"This problem is very complicated.", grammarId:null, tag:"description" },
+  { id:"sc022", chunks:["明日", "雨が", "降る", "かもしれません"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"明日　雨が　降る　かもしれません。", translation:"It might rain tomorrow.", grammarId:"g022", tag:"guessing" },
+  { id:"sc023", chunks:["彼は", "もう", "東京に", "着いているはずです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"彼は　もう　東京に　着いているはずです。", translation:"He should have already arrived in Tokyo.", grammarId:"g023", tag:"expectation" },
+  { id:"sc024", chunks:["田中さんは", "来月", "結婚する", "らしいです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"田中さんは　来月　結婚する　らしいです。", translation:"I heard Tanaka-san is getting married next month.", grammarId:"g019", tag:"guessing" },
+  { id:"sc025", chunks:["このケーキは", "とても", "おいしそうです", "見た目が"], correctOrder:[0,3,1,2], starSlot:3, fullSentence:"このケーキは　見た目が　とても　おいしそうです。", translation:"This cake looks very delicious.", grammarId:"g018", tag:"guessing" },
+  { id:"sc026", chunks:["わすれない", "ように", "メモを", "します"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"わすれない　ように　メモを　します。", translation:"I take notes so that I won't forget.", grammarId:"g046", tag:"purpose" },
+  { id:"sc027", chunks:["健康の", "ために", "毎日", "運動します"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"健康の　ために　毎日　運動します。", translation:"I exercise every day for my health.", grammarId:"g045", tag:"purpose" },
+  { id:"sc028", chunks:["ひらがなが", "読める", "ように", "なりました"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"ひらがなが　読める　ように　なりました。", translation:"I've become able to read hiragana.", grammarId:"g048", tag:"change" },
+  { id:"sc029", chunks:["天気が", "暖かく", "なりました", "だんだん"], correctOrder:[3,0,1,2], starSlot:2, fullSentence:"だんだん　天気が　暖かく　なりました。", translation:"The weather has gradually become warm.", grammarId:"g049", tag:"change" },
+  { id:"sc030", chunks:["私は", "新しい", "パソコンを", "買うつもりです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"私は　新しい　パソコンを　買うつもりです。", translation:"I intend to buy a new computer.", grammarId:"g012", tag:"intention" },
+  { id:"sc031", chunks:["来週", "うちを", "かたづけようと", "思います"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"来週　うちを　かたづけようと　思います。", translation:"I think I'll clean the house next week.", grammarId:"g013", tag:"intention" },
+  { id:"sc032", chunks:["もっと", "勉強した", "ほうが", "いいです"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"もっと　勉強した　ほうが　いいです。", translation:"You'd better study more.", grammarId:"g008", tag:"advice" },
+  { id:"sc033", chunks:["夜遅く", "食べない", "ほうが", "いいです"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"夜遅く　食べない　ほうが　いいです。", translation:"You'd better not eat late at night.", grammarId:"g009", tag:"advice" },
+  { id:"sc034", chunks:["ここで", "たばこを", "吸っては", "いけません"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"ここで　たばこを　吸っては　いけません。", translation:"You must not smoke here.", grammarId:"g004", tag:"prohibition" },
+  { id:"sc035", chunks:["明日は", "早く", "起きなければ", "なりません"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"明日は　早く　起きなければ　なりません。", translation:"I must wake up early tomorrow.", grammarId:"g005", tag:"obligation" },
+  { id:"sc036", chunks:["今日は", "仕事に", "行かなくても", "いいです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"今日は　仕事に　行かなくても　いいです。", translation:"I don't have to go to work today.", grammarId:"g006", tag:"obligation" },
+];
