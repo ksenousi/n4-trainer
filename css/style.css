@@ -127,19 +127,20 @@ button {
 }
 .start-btn:hover { opacity: 0.88; }
 .dash-link {
-  margin-top: 8px;
+  margin-top: 4px;
   background: transparent;
-  border: none;
+  border: 1px solid #2c324d;
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   font-family: inherit;
-  padding: 6px;
-  align-self: center;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  align-self: stretch;
+  text-align: center;
+  transition: border-color 0.15s, color 0.15s;
 }
-.dash-link:hover { color: var(--text); }
+.dash-link:hover { border-color: var(--accent-2); color: var(--text); }
 
 /* ---- Quiz header (exit + progress bar) ---- */
 .quiz-header {
@@ -154,8 +155,10 @@ button {
   font-size: 13px;
   cursor: pointer;
   font-family: inherit;
-  padding: 4px 0;
-  margin-bottom: 8px;
+  padding: 10px 12px;
+  min-height: 44px;
+  min-width: 44px;
+  margin-left: -12px;
 }
 .quiz-exit-btn:hover { color: var(--text); }
 .quiz-topbar {
@@ -327,6 +330,11 @@ button {
 .weak-list { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }
 .weak-list li { margin-bottom: 4px; }
 .empty-hint { color: var(--text-dim); font-size: 14px; }
+.btn-danger {
+  color: var(--red);
+  border-color: rgba(230,83,107,0.4);
+}
+.btn-danger:hover { border-color: var(--red); }
 
 .app-footer {
   text-align: center;

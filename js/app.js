@@ -191,6 +191,7 @@ function renderHome() {
   el.querySelectorAll("[data-deck]").forEach(btn => {
     btn.onclick = () => {
       state.deck = btn.dataset.deck;
+      if (state.deck === "mix") state.filterMode = "all";
       renderHome();
     };
   });
@@ -255,7 +256,9 @@ function renderQuizView() {
     </div>
     <div id="quiz-container"></div>
   `;
-  document.getElementById("quiz-exit-btn").onclick = () => { state.view = "home"; render(); };
+  document.getElementById("quiz-exit-btn").onclick = () => {
+    if (confirm("Exit session? Your progress so far will be saved.")) { state.view = "home"; render(); }
+  };
   renderChoiceQuiz(
     document.getElementById("quiz-container"),
     question,
@@ -264,7 +267,7 @@ function renderQuizView() {
       if (knewIt) state.session.correct++;
       else {
         state.session.wrong++;
-        state.session.wrongItems.push(quizItem);
+        state.session.wrongItems.push({ ...quizItem, _deck: quizDeck });
       }
     },
     () => nextCard()
@@ -289,7 +292,9 @@ function renderReadingQuiz(el) {
     </div>
     <div id="reading-container"></div>
   `;
-  document.getElementById("quiz-exit-btn").onclick = () => { state.view = "home"; render(); };
+  document.getElementById("quiz-exit-btn").onclick = () => {
+    if (confirm("Exit session? Your progress so far will be saved.")) { state.view = "home"; render(); }
+  };
   renderReadingPassage(
     document.getElementById("reading-container"),
     passage,
@@ -340,7 +345,7 @@ function renderSummary() {
         <div class="wrong-items-section">
           <div class="wrong-items-label">Missed items</div>
           <ul class="wrong-items-list">
-            ${wrongItems.slice(0, 8).map(item => {
+            ${wrongItems.map(item => {
               const label = item.pattern || item.kanji || item.kana || item.fullSentence || "";
               const hint = item.meaning || item.translation || "";
               return `<li>${label}${hint ? ` — <span class="wi-hint">${hint}</span>` : ""}</li>`;
@@ -370,6 +375,7 @@ function renderSummary() {
       state.session = { correct: 0, wrong: 0, wrongItems: [] };
       const firstItem = state.queue[0];
       const itemDeck = firstItem._deck || state.deck;
+      state.deck = itemDeck;
       state.currentMode = pickMode(itemDeck === "grammar" ? "grammar" : itemDeck);
       state.view = "quiz";
       render();
@@ -422,7 +428,7 @@ function renderDashboard() {
   });
   if (!anyWeak) html += `<div class="empty-hint">No weak items yet — keep studying!</div>`;
   html += `</div>`;
-  html += `<button class="btn-secondary" id="reset-progress" style="margin-top:24px;width:100%">Reset all progress</button>`;
+  html += `<button class="btn-secondary btn-danger" id="reset-progress" style="margin-top:24px;width:100%">Reset all progress</button>`;
   html += `</div>`;
 
   el.innerHTML = html;

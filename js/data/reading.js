@@ -160,7 +160,7 @@ const READING_DATA = [
     questions: [
       { id:"r016q1", prompt:"明日、学校はどうなりますか。", choices:["いつもと同じ","休みになる","早く終わる","遠足がある"], correctIndex:1 },
       { id:"r016q2", prompt:"この知らせは何について言っていますか。", choices:["地震","台風","祭り","会議"], correctIndex:1 },
-      { id:"r016q3", prompt:"明日、外出しなければならない人はどうすればいいですか。", choices:["電車を使えばいい","できるだけ外に出ないほうがいい","学校に行けばいい","台風の前に出かければいい"], correctIndex:1 },
+      { id:"r016q3", prompt:"このお知らせを書いた人は、何が一番心配だと考えられますか。", choices:["学校の建物が壊れること","人が外に出てけがをすること","電車の運転士が来ないこと","台風が来ないかもしれないこと"], correctIndex:1 },
     ],
     translation: "A typhoon is expected to hit this area tomorrow. School will be closed. Since the wind will get strong, please don't go outside. Trains may also stop.",
   },
