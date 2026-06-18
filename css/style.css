@@ -97,7 +97,7 @@ button {
   border: 1px solid #2c324d;
   color: var(--text-dim);
   padding: 9px 16px;
-  min-height: 40px;
+  min-height: 44px;
   border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
@@ -222,6 +222,7 @@ button {
   margin: 8px 0 4px;
 }
 .score-correct { color: var(--green); }
+.score-dim { color: var(--text-dim); }
 .score-sep { font-size: 32px; color: var(--text-dim); font-weight: 400; }
 .score-pct { font-size: 18px; color: var(--text-dim); margin-bottom: 8px; }
 .score-breakdown {
@@ -295,6 +296,7 @@ button {
   border: 1px solid #2c324d;
   border-radius: 8px;
   padding: 6px 14px;
+  min-height: 44px;
   font-size: 13px;
   cursor: pointer;
   font-family: inherit;
@@ -407,6 +409,8 @@ button {
   max-width: 420px;
   margin-top: 14px;
   text-align: center;
+  position: sticky;
+  bottom: env(safe-area-inset-bottom, 16px);
 }
 .next-area .btn-secondary { width: 100%; padding: 10px; font-size: 15px; }
 

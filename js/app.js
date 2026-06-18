@@ -16,7 +16,7 @@ const DECKS = {
 const DECK_QUIZ_TYPES = {
   vocab:        ["quiz-kana2kanji", "quiz-meaning"],
   kanji:        ["quiz-kana2kanji", "quiz-meaning"],
-  grammar:      ["quiz-cloze", "sentencecomp"],
+  grammar:      ["quiz-cloze"],
   reading:      ["reading-quiz"],
   sentencecomp: ["sentencecomp"],
 };
@@ -236,15 +236,8 @@ function renderQuizView() {
     return;
   }
 
-  // For mix/grammar, sentencecomp mode needs an item from SENTENCE_COMP_DATA
-  let quizItem, quizDeck;
-  if (state.currentMode === "sentencecomp") {
-    quizDeck = "sentencecomp";
-    quizItem = SENTENCE_COMP_DATA[Math.floor(Math.random() * SENTENCE_COMP_DATA.length)];
-  } else {
-    quizItem = currentItem();
-    quizDeck = quizItem._deck || state.deck;
-  }
+  const quizItem = currentItem();
+  const quizDeck = quizItem._deck || state.deck;
 
   const question = buildQuizQuestion(quizDeck, state.currentMode, quizItem);
   const total = state.queue.length;
@@ -271,12 +264,6 @@ function renderQuizView() {
     question,
     (id, deck, knewIt) => {
       Progress.record(id, deck, knewIt);
-      // Also record the underlying grammar queue item when sentencecomp mode is used
-      if (state.currentMode === "sentencecomp") {
-        const qItem = currentItem();
-        const qDeck = qItem._deck || state.deck;
-        Progress.record(`${qDeck}:${qItem.id}`, qDeck, knewIt);
-      }
       if (knewIt) state.session.correct++;
       else {
         state.session.wrong++;
@@ -317,7 +304,9 @@ function renderReadingQuiz(el) {
       if (knewIt) state.session.correct++;
       else {
         state.session.wrong++;
-        state.session.wrongItems.push({ ...passage, _deck: "reading" });
+        if (!state.session.wrongItems.some(w => w.id === passage.id)) {
+          state.session.wrongItems.push({ ...passage, _deck: "reading" });
+        }
       }
     },
     () => { state.readingQIndex += 1; render(); },
@@ -335,10 +324,7 @@ function renderSummary() {
   const { correct, wrong, wrongItems } = state.session;
   const total = correct + wrong;
   const pct = total ? Math.round((correct / total) * 100) : 0;
-  const deckLabel = state.deck === "mix" ? "Mix All"
-    : state.deck === "grammar" ? "Grammar"
-    : state.deck === "reading" ? "Reading"
-    : state.deck === "kanji" ? "Kanji" : "Vocabulary";
+  const deckLabel = DECKS[state.deck]?.label ?? state.deck;
 
   let emoji = pct >= 80 ? "🎉" : pct >= 60 ? "💪" : "📖";
   let message = pct >= 80 ? "Great work!" : pct >= 60 ? "Keep it up!" : "Keep studying!";
@@ -347,9 +333,9 @@ function renderSummary() {
     <div class="summary-card">
       <div class="summary-emoji">${emoji}</div>
       <div class="summary-title">${message}</div>
-      <div class="summary-deck-label">${deckLabel} · ${state.sessionSize === 0 ? "All" : state.sessionSize} cards</div>
+      <div class="summary-deck-label">${deckLabel} · ${state.sessionSize === 0 ? "All" : state.sessionSize} card${state.sessionSize !== 1 ? "s" : ""}</div>
       <div class="score-display">
-        <span class="score-correct">${correct}</span>
+        <span class="${correct > 0 ? "score-correct" : "score-dim"}">${correct}</span>
         <span class="score-sep"> / ${total}</span>
       </div>
       <div class="score-pct">${pct}% correct</div>
@@ -362,8 +348,8 @@ function renderSummary() {
           <div class="wrong-items-label">Missed items</div>
           <ul class="wrong-items-list">
             ${wrongItems.map(item => {
-              const label = item.pattern || item.kanji || item.kana || item.fullSentence || "";
-              const hint = item.meaning || item.translation || "";
+              const label = item.pattern || item.kanji || item.kana || (item.fullSentence ? item.translation : "") || "";
+              const hint = item.fullSentence ? item.fullSentence : (item.meaning || item.translation || "");
               return `<li>${label}${hint ? ` — <span class="wi-hint">${hint}</span>` : ""}</li>`;
             }).join("")}
           </ul>
