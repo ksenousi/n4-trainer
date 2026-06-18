@@ -95,14 +95,17 @@ const Progress = {
 
   streak() {
     const d = this.load();
+    if (!d.studyDays.length) return 0;
     const days = new Set(d.studyDays);
+    // Start from most recent study day (not today), so a day off doesn't break the streak
+    const sorted = d.studyDays.slice().sort();
+    let cursor = new Date(sorted[sorted.length - 1] + "T12:00:00Z");
     let streak = 0;
-    let cursor = new Date();
     while (true) {
       const key = cursor.toISOString().slice(0, 10);
       if (days.has(key)) {
         streak++;
-        cursor.setDate(cursor.getDate() - 1);
+        cursor.setUTCDate(cursor.getUTCDate() - 1);
       } else {
         break;
       }

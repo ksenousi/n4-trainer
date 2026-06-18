@@ -4,7 +4,7 @@
 // `starSlot` is the 1-based position within `correctOrder` that the JLPT-style
 // question marks with a star (★) — i.e. the answer is chunks[correctOrder[starSlot-1]].
 const SENTENCE_COMP_DATA = [
-  { id:"sc001", chunks:["友達に", "本を", "もらった", "ことがあります"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"友達に　本を　もらった　ことがあります。", translation:"I have received a book from a friend before.", grammarId:"g007", tag:"experience" },
+  { id:"sc001", chunks:["もっと", "連絡して", "ほしいです", "私は"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"私は　もっと　連絡して　ほしいです。", translation:"I want you to contact me more.", grammarId:"g092", tag:"requests" },
   { id:"sc002", chunks:["雨が", "降っても", "出かけます", "私は"], correctOrder:[3,0,1,2], starSlot:2, fullSentence:"私は　雨が　降っても　出かけます。", translation:"Even if it rains, I will go out.", grammarId:"g031", tag:"conditional" },
   { id:"sc003", chunks:["音楽を", "聞きながら", "勉強します", "私は"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"私は　音楽を　聞きながら　勉強します。", translation:"I study while listening to music.", grammarId:"g035", tag:"simultaneous" },
   { id:"sc004", chunks:["早く", "起きれば", "間に合います", "会議に"], correctOrder:[0,1,3,2], starSlot:3, fullSentence:"早く　起きれば　会議に　間に合います。", translation:"If you wake up early, you'll make it in time for the meeting.", grammarId:"g027", tag:"conditional" },
@@ -15,8 +15,8 @@ const SENTENCE_COMP_DATA = [
   { id:"sc009", chunks:["授業の", "前に", "本を", "読みました"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"授業の　前に　本を　読みました。", translation:"I read a book before class.", grammarId:"g039", tag:"time" },
   { id:"sc010", chunks:["食事をした", "後で", "歯を", "磨きます"], correctOrder:[0,1,2,3], starSlot:1, fullSentence:"食事をした　後で　歯を　磨きます。", translation:"After eating, I brush my teeth.", grammarId:"g040", tag:"time" },
   { id:"sc011", chunks:["子供が", "寝ている", "間に", "そうじをします"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"子供が　寝ている　間に　そうじをします。", translation:"I clean while the kids are sleeping.", grammarId:"g042", tag:"time" },
-  { id:"sc012", chunks:["彼女は", "私より", "ずっと", "早く走れます"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"彼女は　私より　ずっと　早く走れます。", translation:"She can run much faster than me.", grammarId:"g074", tag:"comparison" },
-  { id:"sc013", chunks:["赤い", "服の", "ほうが", "好きです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"赤い　服の　ほうが　好きです。", translation:"I like the red clothes better.", grammarId:"g075", tag:"comparison" },
+  { id:"sc012", chunks:["彼が", "来るかどうか", "わかりません", "私には"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"私には　彼が　来るかどうか　わかりません。", translation:"I don't know whether he will come or not.", grammarId:"g093", tag:"uncertainty" },
+  { id:"sc013", chunks:["私は", "先生に", "たたされました", "授業中に"], correctOrder:[0,1,3,2], starSlot:4, fullSentence:"私は　先生に　授業中に　たたされました。", translation:"I was made to stand by the teacher during class.", grammarId:"g059", tag:"causative" },
   { id:"sc014", chunks:["家族の", "中で", "兄が", "一番高いです"], correctOrder:[0,1,2,3], starSlot:4, fullSentence:"家族の　中で　兄が　一番高いです。", translation:"Among my family, my older brother is the tallest.", grammarId:"g076", tag:"comparison" },
   { id:"sc015", chunks:["天気予報", "によると", "明日は", "雨です"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"天気予報によると　明日は　雨です。", translation:"According to the weather forecast, it will rain tomorrow.", grammarId:"g068", tag:"source" },
   { id:"sc016", chunks:["彼は", "先生として", "学校で", "働いています"], correctOrder:[0,1,2,3], starSlot:2, fullSentence:"彼は　先生として　学校で　働いています。", translation:"He works as a teacher at a school.", grammarId:"g067", tag:"role" },
@@ -24,7 +24,7 @@ const SENTENCE_COMP_DATA = [
   { id:"sc018", chunks:["駅まで", "歩くのに", "十分", "かかります"], correctOrder:[0,2,1,3], starSlot:2, fullSentence:"駅まで　十分　歩くのに　かかります。", translation:"It takes ten minutes to walk to the station.", grammarId:"g072", tag:"quantity" },
   { id:"sc019", chunks:["お金が", "少ししか", "ありません", "今は"], correctOrder:[3,0,1,2], starSlot:3, fullSentence:"今は　お金が　少ししか　ありません。", translation:"Right now I only have a little money.", grammarId:"g065", tag:"limiting" },
   { id:"sc020", chunks:["日本語だけ", "話して", "ください", "ここでは"], correctOrder:[3,0,1,2], starSlot:2, fullSentence:"ここでは　日本語だけ　話して　ください。", translation:"Please speak only Japanese here.", grammarId:"g064", tag:"limiting" },
-  { id:"sc021", chunks:["この", "問題は", "とても", "複雑です"], correctOrder:[0,1,2,3], starSlot:4, fullSentence:"この　問題は　とても　複雑です。", translation:"This problem is very complicated.", grammarId:null, tag:"description" },
+  { id:"sc021", chunks:["図書館へ", "本を", "借りに", "いきます"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"図書館へ　本を　借りに　いきます。", translation:"I'm going to the library to borrow books.", grammarId:"g094", tag:"purpose" },
   { id:"sc022", chunks:["明日", "雨が", "降る", "かもしれません"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"明日　雨が　降る　かもしれません。", translation:"It might rain tomorrow.", grammarId:"g022", tag:"guessing" },
   { id:"sc023", chunks:["彼は", "もう", "東京に", "着いているはずです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"彼は　もう　東京に　着いているはずです。", translation:"He should have already arrived in Tokyo.", grammarId:"g023", tag:"expectation" },
   { id:"sc024", chunks:["田中さんは", "来月", "結婚する", "らしいです"], correctOrder:[0,1,2,3], starSlot:3, fullSentence:"田中さんは　来月　結婚する　らしいです。", translation:"I heard Tanaka-san is getting married next month.", grammarId:"g019", tag:"guessing" },

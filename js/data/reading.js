@@ -48,6 +48,7 @@ const READING_DATA = [
     questions: [
       { id:"r005q1", prompt:"パーティーはいつありますか。", choices:["来週の土曜日","今週の日曜日","来月","今日"], correctIndex:0 },
       { id:"r005q2", prompt:"食べ物について、何と言っていますか。", choices:["必ず持ってきてください","持ってこなくてもいい","お金を払ってください","レストランに行く"], correctIndex:1 },
+      { id:"r005q3", prompt:"この人はどんな人だと考えられますか。", choices:["山田さんにパーティーに来てほしくない","ゆっくりした、気軽なパーティーを開きたい","時間に厳しい人だ","食べ物を買うお金がない"], correctIndex:1 },
     ],
     translation: "Yamada-san, I'm having a party at my house next Saturday. Please come if you can. It's at my house near the usual station. You can bring food or not, either is fine. Any time is okay.",
   },
@@ -138,6 +139,7 @@ const READING_DATA = [
     questions: [
       { id:"r014q1", prompt:"この人は今、何ができますか。", choices:["ひらがなが読めない","新聞が読める","日本に住んでいる","先生として働いている"], correctIndex:1 },
       { id:"r014q2", prompt:"来年、この人は何をするつもりですか。", choices:["日本語の先生になる","日本に留学する","新しい仕事を始める","結婚する"], correctIndex:1 },
+      { id:"r014q3", prompt:"この人の勉強方法から、何が分かりますか。", choices:["才能があるから上手になった","毎日続けることが大切だと分かる","3年では日本語は無理だと思っている","先生がいないと日本語は無理だ"], correctIndex:1 },
     ],
     translation: "I've been studying Japanese for 3 years. At first I couldn't even read hiragana, but by practicing a little every day, I can now even read newspapers. I intend to study abroad in Japan next year.",
   },
@@ -158,6 +160,7 @@ const READING_DATA = [
     questions: [
       { id:"r016q1", prompt:"明日、学校はどうなりますか。", choices:["いつもと同じ","休みになる","早く終わる","遠足がある"], correctIndex:1 },
       { id:"r016q2", prompt:"この知らせは何について言っていますか。", choices:["地震","台風","祭り","会議"], correctIndex:1 },
+      { id:"r016q3", prompt:"明日、外出しなければならない人はどうすればいいですか。", choices:["電車を使えばいい","できるだけ外に出ないほうがいい","学校に行けばいい","台風の前に出かければいい"], correctIndex:1 },
     ],
     translation: "A typhoon is expected to hit this area tomorrow. School will be closed. Since the wind will get strong, please don't go outside. Trains may also stop.",
   },

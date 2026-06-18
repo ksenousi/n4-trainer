@@ -30,7 +30,7 @@ const state = {
   index: 0,
   readingQIndex: 0,
   currentMode: null,
-  session: { correct: 0, wrong: 0 },
+  session: { correct: 0, wrong: 0, wrongItems: [] },
 };
 
 // ---- Helpers ----
@@ -114,7 +114,7 @@ function buildQueue() {
 
 function startSession() {
   buildQueue();
-  state.session = { correct: 0, wrong: 0 };
+  state.session = { correct: 0, wrong: 0, wrongItems: [] };
   state.view = "quiz";
   render();
 }
@@ -160,6 +160,13 @@ function renderHome() {
         `).join("")}
       </div>
 
+      <div class="home-section-label">Focus</div>
+      <div class="pill-row" id="filter-pills">
+        ${[{id:"all",label:"All"},{id:"unknown",label:"Unknown"},{id:"weak",label:"Weak"}].map(f => `
+          <button class="option-pill${state.filterMode === f.id ? " active" : ""}" data-filter="${f.id}">${f.label}</button>
+        `).join("")}
+      </div>
+
       <div class="home-section-label">Session length</div>
       <div class="pill-row" id="size-pills">
         ${sizeOptions.map(s => `
@@ -175,6 +182,12 @@ function renderHome() {
     </div>
   `;
 
+  el.querySelectorAll("[data-filter]").forEach(btn => {
+    btn.onclick = () => {
+      state.filterMode = btn.dataset.filter;
+      renderHome();
+    };
+  });
   el.querySelectorAll("[data-deck]").forEach(btn => {
     btn.onclick = () => {
       state.deck = btn.dataset.deck;
@@ -228,20 +241,31 @@ function renderQuizView() {
   const question = buildQuizQuestion(quizDeck, state.currentMode, quizItem);
   const total = state.queue.length;
   const current = state.index + 1;
+  const { correct, wrong } = state.session;
   el.innerHTML = `
-    <div class="session-progress">
-      <div class="session-progress-bar" style="width:${Math.round((current / total) * 100)}%"></div>
+    <div class="quiz-header">
+      <div class="quiz-topbar">
+        <button class="quiz-exit-btn" id="quiz-exit-btn">✕ Exit</button>
+        <div class="quiz-score-live"><span class="qs-correct">✓${correct}</span> <span class="qs-wrong">✗${wrong}</span></div>
+      </div>
+      <div class="session-progress">
+        <div class="session-progress-bar" style="width:${Math.round((current / total) * 100)}%"></div>
+      </div>
+      <div class="progress-label">${current} / ${total}</div>
     </div>
-    <div class="progress-label">${current} / ${total}</div>
     <div id="quiz-container"></div>
   `;
+  document.getElementById("quiz-exit-btn").onclick = () => { state.view = "home"; render(); };
   renderChoiceQuiz(
     document.getElementById("quiz-container"),
     question,
     (id, deck, knewIt) => {
       Progress.record(id, deck, knewIt);
       if (knewIt) state.session.correct++;
-      else state.session.wrong++;
+      else {
+        state.session.wrong++;
+        state.session.wrongItems.push(quizItem);
+      }
     },
     () => nextCard()
   );
@@ -251,13 +275,21 @@ function renderReadingQuiz(el) {
   const passage = currentItem();
   const qIndex = state.readingQIndex || 0;
   const total = state.queue.length;
+  const { correct: rc, wrong: rw } = state.session;
   el.innerHTML = `
-    <div class="session-progress">
-      <div class="session-progress-bar" style="width:${Math.round(((state.index + 1) / total) * 100)}%"></div>
+    <div class="quiz-header">
+      <div class="quiz-topbar">
+        <button class="quiz-exit-btn" id="quiz-exit-btn">✕ Exit</button>
+        <div class="quiz-score-live"><span class="qs-correct">✓${rc}</span> <span class="qs-wrong">✗${rw}</span></div>
+      </div>
+      <div class="session-progress">
+        <div class="session-progress-bar" style="width:${Math.round(((state.index + 1) / total) * 100)}%"></div>
+      </div>
+      <div class="progress-label">Passage ${state.index + 1} / ${total} — Q${qIndex + 1}/${passage.questions.length}</div>
     </div>
-    <div class="progress-label">Passage ${state.index + 1} / ${total} — Q${qIndex + 1}/${passage.questions.length}</div>
     <div id="reading-container"></div>
   `;
+  document.getElementById("quiz-exit-btn").onclick = () => { state.view = "home"; render(); };
   renderReadingPassage(
     document.getElementById("reading-container"),
     passage,
@@ -279,7 +311,7 @@ function renderSummary() {
   nav.innerHTML = "";
   controls.innerHTML = "";
 
-  const { correct, wrong } = state.session;
+  const { correct, wrong, wrongItems } = state.session;
   const total = correct + wrong;
   const pct = total ? Math.round((correct / total) * 100) : 0;
   const deckLabel = state.deck === "mix" ? "Mix All"
@@ -304,8 +336,21 @@ function renderSummary() {
         <span class="score-right-chip">✓ ${correct} right</span>
         <span class="score-wrong-chip">✗ ${wrong} wrong</span>
       </div>
+      ${wrongItems && wrongItems.length ? `
+        <div class="wrong-items-section">
+          <div class="wrong-items-label">Missed items</div>
+          <ul class="wrong-items-list">
+            ${wrongItems.slice(0, 8).map(item => {
+              const label = item.pattern || item.kanji || item.kana || item.fullSentence || "";
+              const hint = item.meaning || item.translation || "";
+              return `<li>${label}${hint ? ` — <span class="wi-hint">${hint}</span>` : ""}</li>`;
+            }).join("")}
+          </ul>
+        </div>
+      ` : ""}
       <div class="summary-actions">
         <button class="start-btn" id="summary-again-btn">Study again</button>
+        ${wrongItems && wrongItems.length ? `<button class="start-btn drill-btn" id="summary-drill-btn">🔁 Drill missed (${wrongItems.length})</button>` : ""}
         <button class="btn-secondary" id="summary-menu-btn">← Back to menu</button>
         <button class="dash-link" id="summary-dash-btn">📊 Dashboard</button>
       </div>
@@ -315,6 +360,21 @@ function renderSummary() {
   document.getElementById("summary-again-btn").onclick = () => startSession();
   document.getElementById("summary-menu-btn").onclick = () => { state.view = "home"; render(); };
   document.getElementById("summary-dash-btn").onclick = () => { state.view = "dashboard"; render(); };
+  const drillBtn = document.getElementById("summary-drill-btn");
+  if (drillBtn) {
+    drillBtn.onclick = () => {
+      // Drill only the missed items
+      state.queue = shuffle(wrongItems.slice());
+      state.index = 0;
+      state.readingQIndex = 0;
+      state.session = { correct: 0, wrong: 0, wrongItems: [] };
+      const firstItem = state.queue[0];
+      const itemDeck = firstItem._deck || state.deck;
+      state.currentMode = pickMode(itemDeck === "grammar" ? "grammar" : itemDeck);
+      state.view = "quiz";
+      render();
+    };
+  }
 }
 
 function renderDashboard() {

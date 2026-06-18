@@ -56,8 +56,8 @@ function clozeReveal(cloze) {
 function buildClozeQuestion(item) {
   const { choices, correctIndex } = pickDistractors(GRAMMAR_DATA, item, "tag", 3, (x) => x.pattern);
   return {
-    promptHtml: `<div class="meaning-hint">${item.meaning}</div><div class="cloze">${clozeBlank(item.cloze)}</div>`,
-    revealHtml: `<div class="example">${item.example}</div><div class="example-translation">${item.translation}</div>`,
+    promptHtml: `<div class="cloze">${clozeBlank(item.cloze)}</div>`,
+    revealHtml: `<div class="meaning-hint">${item.meaning}</div><div class="cloze">${clozeReveal(item.cloze)}</div><div class="example-translation">${item.translation}</div>`,
     choiceLabels: choices.map((c) => c.pattern),
     correctIndex,
     deck: "grammar",
