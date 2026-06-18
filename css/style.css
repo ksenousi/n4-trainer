@@ -396,6 +396,7 @@ button {
   font-size: 16px;
 }
 .star-marker { color: var(--accent); font-weight: 700; }
+.star-slot { border-color: var(--accent); min-width: 48px; }
 
 /* ---- Reading comprehension ---- */
 .passage-card {

@@ -66,19 +66,24 @@ function buildClozeQuestion(item) {
 }
 
 function buildSentenceCompQuestion(item) {
-  const displayOrder = shuffle(item.chunks.map((_, i) => i));
   const correctChunkIndex = item.correctOrder[item.starSlot - 1];
+
+  // Build the sentence with ★ replacing the missing slot; other chunks in correct order.
+  const sentenceRow = item.correctOrder
+    .map((chunkIdx, pos) =>
+      pos === item.starSlot - 1
+        ? `<span class="chunk-chip star-slot"><span class="star-marker">★</span></span>`
+        : `<span class="chunk-chip">${item.chunks[chunkIdx]}</span>`
+    )
+    .join("");
+
   const choices = shuffle(item.chunks.map((text, idx) => ({ idx, text })));
   const correctIndex = choices.findIndex((c) => c.idx === correctChunkIndex);
 
-  const chunkRow = displayOrder
-    .map((idx) => `<span class="chunk-chip">${item.chunks[idx]}</span>`)
-    .join("");
-
   return {
     promptHtml: `
-      <div class="chunk-row">${chunkRow}</div>
-      <div class="meaning-hint">What goes in the <span class="star-marker">★</span> position (slot ${item.starSlot})?</div>
+      <div class="chunk-row">${sentenceRow}</div>
+      <div class="meaning-hint">Which chunk fills the <span class="star-marker">★</span>?</div>
     `,
     revealHtml: `<div class="example">${item.fullSentence}</div><div class="example-translation">${item.translation}</div>`,
     choiceLabels: choices.map((c) => c.text),
