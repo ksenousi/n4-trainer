@@ -131,28 +131,6 @@ button {
   margin-bottom: 10px;
 }
 
-.flashcard {
-  width: 100%;
-  max-width: 420px;
-  min-height: 260px;
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  text-align: center;
-  position: relative;
-  border: 1px solid #262c47;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-.flashcard .card-back { display: none; }
-.flashcard.flipped .card-front { display: none; }
-.flashcard.flipped .card-back { display: block; }
-.card-face { width: 100%; }
 
 .jp-large { font-size: 42px; font-weight: 600; margin-bottom: 6px; }
 .kana-sub { font-size: 18px; color: var(--text-dim); margin-bottom: 8px; }
@@ -174,36 +152,6 @@ button {
   padding: 3px 10px;
   border-radius: 12px;
 }
-
-.hint {
-  color: var(--text-dim);
-  font-size: 13px;
-  margin-top: 12px;
-  min-height: 18px;
-}
-
-.answer-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 14px;
-  width: 100%;
-  max-width: 420px;
-}
-.answer-buttons.hidden { visibility: hidden; height: 0; margin: 0; }
-.btn-wrong, .btn-right {
-  flex: 1;
-  padding: 12px;
-  min-height: 48px;
-  border-radius: 10px;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-wrong { background: rgba(230,83,107,0.15); color: var(--red); border: 1px solid var(--red); }
-.btn-right { background: rgba(76,175,120,0.15); color: var(--green); border: 1px solid var(--green); }
-.btn-wrong:hover { background: rgba(230,83,107,0.3); }
-.btn-right:hover { background: rgba(76,175,120,0.3); }
 
 .empty-state {
   text-align: center;
@@ -250,33 +198,6 @@ button {
   color: var(--text-dim);
   font-size: 13px;
   padding: 20px;
-}
-
-/* ---- Mode sub-nav (second pill row, shown only for multi-mode decks) ---- */
-.mode-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  padding: 0 8px 8px;
-}
-.mode-tab {
-  background: transparent;
-  border: 1px solid #232842;
-  color: var(--text-dim);
-  padding: 8px 12px;
-  min-height: 38px;
-  border-radius: 16px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.15s;
-}
-.mode-tab:hover { border-color: var(--accent); color: var(--text); }
-.mode-tab.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  font-weight: 600;
 }
 
 /* ---- Multiple-choice quiz UI (grammar cloze, vocab/kanji drills, reading) ---- */
@@ -378,14 +299,12 @@ button {
   .kanji-giant { font-size: 72px; }
   .jp-large { font-size: 34px; }
   .choice-grid { grid-template-columns: 1fr; }
-  .flashcard { padding: 20px 16px; min-height: 220px; }
   .passage-card { padding: 16px; }
 }
 
 @media (max-width: 360px) {
   .app-header h1 { font-size: 22px; }
   .nav-btn { padding: 8px 12px; font-size: 13px; }
-  .mode-tab { padding: 6px 10px; font-size: 11px; }
   .kanji-giant { font-size: 60px; }
   .jp-large { font-size: 28px; }
   .pattern-large { font-size: 21px; }

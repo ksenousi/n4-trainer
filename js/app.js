@@ -1,4 +1,4 @@
-// Main app logic: deck/mode selection, flashcard rendering, quiz rendering,
+// Main app logic: deck selection, multiple-choice quiz rendering,
 // filtering, dashboard.
 
 const READING_QUESTIONS = READING_DATA.flatMap((p) =>
@@ -13,38 +13,30 @@ const DECKS = {
   reading: { data: READING_QUESTIONS, label: "Reading", idPrefix: "reading" },
 };
 
-const DECK_MODES = {
-  vocab: [
-    { id: "flashcards", label: "Flashcards" },
-    { id: "quiz-kana2kanji", label: "Kana→Kanji" },
-    { id: "quiz-fillblank", label: "Fill-in-blank" },
-    { id: "quiz-meaning", label: "Meaning match" },
-  ],
-  kanji: [
-    { id: "flashcards", label: "Flashcards" },
-    { id: "quiz-kana2kanji", label: "Reading→Kanji" },
-    { id: "quiz-fillblank", label: "Fill-in-blank" },
-    { id: "quiz-meaning", label: "Meaning match" },
-  ],
-  grammar: [
-    { id: "flashcards", label: "Flashcards" },
-    { id: "quiz-cloze", label: "Fill-in-blank quiz" },
-    { id: "sentencecomp", label: "Sentence building" },
-  ],
-  reading: [{ id: "reading-quiz", label: "Reading" }],
+// Quiz styles randomly mixed per card within each deck.
+const DECK_QUIZ_TYPES = {
+  vocab:     ["quiz-kana2kanji", "quiz-fillblank", "quiz-meaning"],
+  kanji:     ["quiz-kana2kanji", "quiz-fillblank", "quiz-meaning"],
+  grammar:   ["quiz-cloze", "sentencecomp"],
+  reading:   ["reading-quiz"],
   dashboard: [],
 };
 
 const state = {
   deck: "vocab", // vocab | kanji | grammar | reading | dashboard
-  mode: "flashcards",
+  currentMode: "quiz-kana2kanji", // picked randomly per card
   queue: [],     // shuffled array of items currently being studied
   index: 0,
   readingQIndex: 0,
-  flipped: false,
   filterMode: "all", // all | unknown | weak
   tagFilter: "all",
 };
+
+function pickMode(deck) {
+  const types = DECK_QUIZ_TYPES[deck];
+  if (!types || !types.length) return null;
+  return types[Math.floor(Math.random() * types.length)];
+}
 
 function cardId(deck, item) {
   return `${deck}:${item.id}`;
@@ -60,16 +52,13 @@ function shuffle(arr) {
 }
 
 // Resolves which item pool / progress-deck-name / category key to use for the
-// CURRENT state.deck + state.mode combination. Flashcards and the vocab/kanji/
-// grammar quiz drills all share the same underlying pool + card ids as their
-// deck's flashcards (so progress merges). Sentence-comp and reading are their
-// own pseudo-decks with their own pools.
+// current state.deck + state.currentMode combination.
 function poolAndTagKeyForMode() {
-  const { deck, mode } = state;
-  if (mode === "sentencecomp") {
+  const { deck, currentMode } = state;
+  if (currentMode === "sentencecomp") {
     return { items: SENTENCE_COMP_DATA, progressDeck: "sentencecomp", tagKey: "tag", isReading: false };
   }
-  if (mode === "reading-quiz") {
+  if (currentMode === "reading-quiz") {
     return { items: READING_DATA, progressDeck: "reading", tagKey: null, isReading: true };
   }
   const tagKey = deck === "vocab" ? "pos" : deck === "grammar" ? "tag" : null;
@@ -84,13 +73,18 @@ function getTags() {
 
 function buildQueue() {
   if (state.deck === "dashboard") return;
-  const { items: pool, progressDeck, tagKey, isReading } = poolAndTagKeyForMode();
+  // Use a representative mode for the deck to resolve the pool.
+  // For grammar, sentencecomp shares same items as quiz-cloze from the grammar deck's perspective
+  // so we need to pick the base mode for pool resolution when building the queue.
+  const baseModes = { grammar: "quiz-cloze", vocab: "quiz-kana2kanji", kanji: "quiz-kana2kanji", reading: "reading-quiz" };
+  state.currentMode = baseModes[state.deck] || DECK_QUIZ_TYPES[state.deck][0];
   state.readingQIndex = 0;
+
+  const { items: pool, progressDeck, tagKey, isReading } = poolAndTagKeyForMode();
 
   if (isReading) {
     state.queue = shuffle(pool);
     state.index = 0;
-    state.flipped = false;
     return;
   }
 
@@ -110,7 +104,8 @@ function buildQueue() {
 
   state.queue = shuffle(items);
   state.index = 0;
-  state.flipped = false;
+  // Pick a random mode for the first card
+  state.currentMode = pickMode(state.deck);
 }
 
 function currentItem() {
@@ -133,37 +128,12 @@ function renderNav() {
     btn.textContent = t.label;
     btn.onclick = () => {
       state.deck = t.id;
-      state.mode = (DECK_MODES[t.id] && DECK_MODES[t.id][0] && DECK_MODES[t.id][0].id) || "flashcards";
       state.filterMode = "all";
       state.tagFilter = "all";
       if (t.id !== "dashboard") buildQueue();
       render();
     };
     nav.appendChild(btn);
-  });
-}
-
-function renderModeTabs() {
-  const el = document.getElementById("mode-tabs");
-  if (!el) return;
-  const modes = DECK_MODES[state.deck] || [];
-  if (modes.length <= 1) {
-    el.innerHTML = "";
-    return;
-  }
-  el.innerHTML = "";
-  modes.forEach((m) => {
-    const btn = document.createElement("button");
-    btn.className = "mode-tab" + (state.mode === m.id ? " active" : "");
-    btn.textContent = m.label;
-    btn.onclick = () => {
-      state.mode = m.id;
-      state.filterMode = "all";
-      state.tagFilter = "all";
-      buildQueue();
-      render();
-    };
-    el.appendChild(btn);
   });
 }
 
@@ -227,7 +197,7 @@ function renderControls() {
   shuffleBtn.onclick = () => {
     state.queue = shuffle(state.queue);
     state.index = 0;
-    state.flipped = false;
+    state.currentMode = pickMode(state.deck);
     render();
   };
   filterWrap.appendChild(shuffleBtn);
@@ -235,97 +205,20 @@ function renderControls() {
   el.appendChild(filterWrap);
 }
 
-function cardFrontBack(deck, item) {
-  if (deck === "vocab") {
-    return {
-      front: `<div class="jp-large">${item.kanji}</div><div class="kana-sub">${item.kana}</div><div class="tag-chip">${item.pos}</div>`,
-      back: `<div class="meaning-large">${item.meaning}</div><div class="example">${item.example}</div><div class="example-translation">${item.exampleTranslation}</div>`,
-    };
-  }
-  if (deck === "kanji") {
-    return {
-      front: `<div class="kanji-giant">${item.kanji}</div>`,
-      back: `<div class="meaning-large">${item.meaning}</div>
-             <div class="readings"><b>On:</b> ${item.onyomi} &nbsp; <b>Kun:</b> ${item.kunyomi}</div>
-             <div class="example">${item.example} <span class="kana-sub">(${item.exampleReading})</span></div>
-             <div class="example-translation">${item.exampleMeaning}</div>`,
-    };
-  }
-  if (deck === "grammar") {
-    return {
-      front: `<div class="meaning-hint">${item.meaning}</div><div class="cloze">${clozeBlank(item.cloze)}</div>`,
-      back: `<div class="pattern-large">${item.pattern}</div>
-             <div class="structure"><b>Structure:</b> ${item.structure}</div>
-             <div class="example">${clozeReveal(item.cloze)}</div>
-             <div class="example-translation">${item.translation}</div>
-             <div class="tag-chip">${item.tag}</div>`,
-    };
-  }
-  return { front: "", back: "" };
-}
-
 function emptyStateHtml() {
   return `<div class="empty-state">🎉 Nothing to study here right now!<br>Try switching the filter above, or come back after reviewing more cards.</div>`;
 }
 
-function renderCard() {
-  const el = document.getElementById("card-area");
-  const deck = state.deck;
-  if (!state.queue.length) {
-    el.innerHTML = emptyStateHtml();
-    return;
-  }
-  const item = currentItem();
-  const { front, back } = cardFrontBack(deck, item);
-  const progressLabel = `${state.index + 1} / ${state.queue.length}`;
-
-  el.innerHTML = `
-    <div class="progress-label">${progressLabel}</div>
-    <div class="flashcard ${state.flipped ? "flipped" : ""}" id="flashcard">
-      <div class="card-face card-front">${front}</div>
-      <div class="card-face card-back">${back}</div>
-    </div>
-    <div class="hint">${state.flipped ? "" : "Tap the card to reveal the answer"}</div>
-    <div class="answer-buttons ${state.flipped ? "" : "hidden"}">
-      <button class="btn-wrong" id="btn-wrong">❌ Didn't know</button>
-      <button class="btn-right" id="btn-right">✅ Knew it</button>
-    </div>
-  `;
-
-  document.getElementById("flashcard").onclick = () => {
-    state.flipped = !state.flipped;
-    render();
-  };
-
-  if (state.flipped) {
-    document.getElementById("btn-wrong").onclick = (e) => {
-      e.stopPropagation();
-      answer(false);
-    };
-    document.getElementById("btn-right").onclick = (e) => {
-      e.stopPropagation();
-      answer(true);
-    };
-  }
-}
-
-function answer(knewIt) {
-  const deck = state.deck;
-  const item = currentItem();
-  Progress.record(cardId(deck, item), deck, knewIt);
-  nextCard();
-}
-
 function nextCard() {
-  state.flipped = false;
   state.readingQIndex = 0;
   if (state.index < state.queue.length - 1) {
     state.index += 1;
   } else {
-    // loop back to start, reshuffle
     state.queue = shuffle(state.queue);
     state.index = 0;
   }
+  // Pick a fresh random mode for the next card
+  state.currentMode = pickMode(state.deck);
   render();
 }
 
@@ -335,8 +228,19 @@ function renderQuiz() {
     el.innerHTML = emptyStateHtml();
     return;
   }
-  const item = currentItem();
-  const question = buildQuizQuestion(state.deck, state.mode, item);
+
+  // sentencecomp has its own data pool separate from GRAMMAR_DATA — pick a
+  // random item from it rather than using the grammar queue item.
+  let quizItem, quizDeck;
+  if (state.currentMode === "sentencecomp") {
+    quizDeck = "sentencecomp";
+    quizItem = SENTENCE_COMP_DATA[Math.floor(Math.random() * SENTENCE_COMP_DATA.length)];
+  } else {
+    quizItem = currentItem();
+    quizDeck = state.deck;
+  }
+
+  const question = buildQuizQuestion(quizDeck, state.currentMode, quizItem);
   const progressLabel = `${state.index + 1} / ${state.queue.length}`;
   el.innerHTML = `<div class="progress-label">${progressLabel}</div><div id="quiz-container"></div>`;
   renderChoiceQuiz(
@@ -426,13 +330,13 @@ function renderDashboard() {
 
 function render() {
   renderNav();
-  renderModeTabs();
+  // Clear mode-tabs area (no longer used)
+  const modeTabs = document.getElementById("mode-tabs");
+  if (modeTabs) modeTabs.innerHTML = "";
   renderControls();
   if (state.deck === "dashboard") {
     renderDashboard();
-  } else if (state.mode === "flashcards") {
-    renderCard();
-  } else if (state.mode === "reading-quiz") {
+  } else if (state.currentMode === "reading-quiz") {
     renderReadingQuiz();
   } else {
     renderQuiz();
