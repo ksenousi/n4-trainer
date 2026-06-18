@@ -84,7 +84,7 @@ const KANJI_DATA = [
   { id:"k081", kanji:"記", onyomi:"キ", kunyomi:"しる.す", meaning:"record / write", example:"記事", exampleReading:"きじ", exampleMeaning:"article" },
   { id:"k082", kanji:"雑", onyomi:"ザツ", kunyomi:"-", meaning:"miscellaneous", example:"雑誌", exampleReading:"ざっし", exampleMeaning:"magazine" },
   { id:"k083", kanji:"誌", onyomi:"シ", kunyomi:"-", meaning:"journal / record", example:"雑誌", exampleReading:"ざっし", exampleMeaning:"magazine" },
-  { id:"k084", kanji:"組", onyomi:"ソ", kunyomi:"く.む", meaning:"group /组成", example:"番組", exampleReading:"ばんぐみ", exampleMeaning:"TV program" },
+  { id:"k084", kanji:"組", onyomi:"ソ", kunyomi:"く.む", meaning:"group / assemble", example:"番組", exampleReading:"ばんぐみ", exampleMeaning:"TV program" },
   { id:"k085", kanji:"放", onyomi:"ホウ", kunyomi:"はな.す", meaning:"release / broadcast", example:"放送", exampleReading:"ほうそう", exampleMeaning:"broadcast" },
   { id:"k086", kanji:"送", onyomi:"ソウ", kunyomi:"おく.る", meaning:"send", example:"放送", exampleReading:"ほうそう", exampleMeaning:"broadcast" },
   { id:"k087", kanji:"返", onyomi:"ヘン", kunyomi:"かえ.す", meaning:"return", example:"返事", exampleReading:"へんじ", exampleMeaning:"reply" },
