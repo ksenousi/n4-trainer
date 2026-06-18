@@ -86,7 +86,7 @@ const GRAMMAR_DATA = [
   { id:"g076", pattern:"〜中で〜が一番", meaning:"out of all ~, ~ is the most (superlative)", structure:"Noun+の中で + adj + 一番", example:"かぞくの中で　あにが　一番　たかいです。", cloze:"かぞくの中で　あにが　___一番___　たかいです。", translation:"Among my family, my older brother is the tallest.", tag:"comparison" },
   { id:"g077", pattern:"〜でも", meaning:"even ~ / any ~ at all", structure:"Noun + でも", example:"こどもでも　わかります。", cloze:"こども___でも___　わかります。", translation:"Even a child would understand.", tag:"emphasis" },
   { id:"g078", pattern:"疑問詞 + でも", meaning:"any~ (anybody, anywhere, anytime)", structure:"だれ/どこ/いつ + でも", example:"いつでも　れんらくしてください。", cloze:"いつ___でも___　れんらくしてください。", translation:"Please contact me any time.", tag:"emphasis" },
-  { id:"g079", pattern:"疑問詞 + か", meaning:"some~ (something, somewhere, someone - indefinite)", structure:"だれ/どこ/なに + か", example:"だれか　きましたか。", cloze:"___だれ___か　きましたか。", translation:"Did someone come?", tag:"indefinite" },
+  { id:"g079", pattern:"疑問詞 + か", meaning:"some~ (something, somewhere, someone - indefinite)", structure:"だれ/どこ/なに + か", example:"だれか　きましたか。", cloze:"___だれか___　きましたか。", translation:"Did someone come?", tag:"indefinite" },
   { id:"g080", pattern:"疑問詞 + も + ない/ません", meaning:"no~ at all (nobody, nowhere, nothing)", structure:"だれ/どこ/なに + も + negative", example:"きょうは　どこも　いきません。", cloze:"きょうは　どこ___も___　いきません。", translation:"I'm not going anywhere today.", tag:"negation" },
   { id:"g081", pattern:"〜げ / 〜そう (様子)", meaning:"looking ~ / seeming ~", structure:"い-adj stem + そう", example:"あの子は　さびしそうです。", cloze:"あの子は　さびし___そうです___。", translation:"That child looks lonely.", tag:"guessing" },
   { id:"g082", pattern:"〜命令形 (imperative)", meaning:"command form (do it!) - casual / strong", structure:"u-verb: う→え / ru-verb: る→ろ", example:"はやく　いけ！", cloze:"はやく　___いけ___！", translation:"Go quickly!", tag:"imperative" },
@@ -99,7 +99,7 @@ const GRAMMAR_DATA = [
   { id:"g089", pattern:"〜にする", meaning:"decide on ~ / choose ~", structure:"Noun + にする", example:"のみものは　コーヒーにします。", cloze:"のみものは　コーヒー___にします___。", translation:"I'll have coffee (decide on coffee).", tag:"choice" },
   { id:"g090", pattern:"〜について話す / 相談する", meaning:"talk/consult about ~", structure:"Noun + について + Verb", example:"しんろについて　せんせいに　そうだんしました。", cloze:"しんろ___について___　せんせいに　そうだんしました。", translation:"I consulted my teacher about my future path.", tag:"topic" },
   { id:"g091", pattern:"〜てみる", meaning:"try doing ~ (to see what happens)", structure:"Verb-て + みる", example:"この　りょうりを　たべてみてください。", cloze:"この　りょうりを　たべ___てみてください___。", translation:"Please try eating this dish.", tag:"attempt" },
-  { id:"g092", pattern:"〜てほしい", meaning:"want someone to do ~", structure:"Verb-て + ほしい", example:"もっと　れんらくして　ほしいです。", cloze:"もっと　れんらくし___てほしいです___。", translation:"I want you to contact me more.", tag:"requests" },
+  { id:"g092", pattern:"〜てほしい", meaning:"want someone to do ~", structure:"Verb-て + ほしい", example:"もっと　れんらくしてほしいです。", cloze:"もっと　れんらくし___てほしいです___。", translation:"I want you to contact me more.", tag:"requests" },
   { id:"g093", pattern:"〜かどうか", meaning:"whether or not ~", structure:"plain form + かどうか", example:"かれが　くるかどうか　わかりません。", cloze:"かれが　くる___かどうか___　わかりません。", translation:"I don't know whether he will come or not.", tag:"uncertainty" },
-  { id:"g094", pattern:"〜にいく / 〜にくる", meaning:"go/come to do ~", structure:"Verb-stem + にいく/にくる", example:"としょかんへ　ほんを　かりにいきます。", cloze:"としょかんへ　ほんを　かりに___いきます___。", translation:"I'm going to the library to borrow books.", tag:"purpose" },
+  { id:"g094", pattern:"〜にいく / 〜にくる", meaning:"go/come to do ~", structure:"Verb-stem + にいく/にくる", example:"としょかんへ　ほんを　かりにいきます。", cloze:"としょかんへ　ほんを　かり___にいきます___。", translation:"I'm going to the library to borrow books.", tag:"purpose" },
 ];

@@ -104,7 +104,11 @@ button {
   transition: all 0.15s;
   font-family: inherit;
 }
-.option-pill:hover { border-color: var(--accent-2); color: var(--text); }
+.option-pill:hover:not(:disabled) { border-color: var(--accent-2); color: var(--text); }
+.option-pill.disabled-pill, .option-pill:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
 .option-pill.active {
   background: var(--accent-2);
   color: #0f1220;
@@ -264,8 +268,13 @@ button {
   line-height: 1.7;
 }
 .wi-hint { color: var(--text-dim); font-size: 13px; }
-.drill-btn { background: #262c47; margin-top: 0; }
-.drill-btn:hover { opacity: 0.88; }
+.drill-btn {
+  width: 100%;
+  padding: 11px;
+  font-size: 15px;
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+}
 .summary-actions {
   width: 100%;
   display: flex;

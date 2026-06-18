@@ -113,6 +113,7 @@ function buildQueue() {
 }
 
 function startSession() {
+  state._sessionDeck = state.deck;
   buildQueue();
   state.session = { correct: 0, wrong: 0, wrongItems: [] };
   state.view = "quiz";
@@ -163,7 +164,7 @@ function renderHome() {
       <div class="home-section-label">Focus</div>
       <div class="pill-row" id="filter-pills">
         ${[{id:"all",label:"All"},{id:"unknown",label:"Unknown"},{id:"weak",label:"Weak"}].map(f => `
-          <button class="option-pill${state.filterMode === f.id ? " active" : ""}" data-filter="${f.id}">${f.label}</button>
+          <button class="option-pill${state.filterMode === f.id ? " active" : ""}${state.deck === "mix" || state.deck === "reading" ? " disabled-pill" : ""}" data-filter="${f.id}" ${state.deck === "mix" || state.deck === "reading" ? "disabled" : ""}>${f.label}</button>
         `).join("")}
       </div>
 
@@ -209,7 +210,12 @@ function renderHome() {
 }
 
 function emptyStateHtml() {
-  return `<div class="empty-state">🎉 Nothing to study here right now!<br>Try a different filter, or switch decks.</div>`;
+  return `
+    <div class="empty-state">
+      🎉 Nothing to study here right now!<br>Try a different filter, or switch decks.
+      <br><br>
+      <button class="btn-secondary" id="empty-back-btn">← Back to menu</button>
+    </div>`;
 }
 
 function renderQuizView() {
@@ -221,6 +227,7 @@ function renderQuizView() {
 
   if (!state.queue.length) {
     el.innerHTML = emptyStateHtml();
+    document.getElementById("empty-back-btn").onclick = () => { state.view = "home"; render(); };
     return;
   }
 
@@ -264,6 +271,12 @@ function renderQuizView() {
     question,
     (id, deck, knewIt) => {
       Progress.record(id, deck, knewIt);
+      // Also record the underlying grammar queue item when sentencecomp mode is used
+      if (state.currentMode === "sentencecomp") {
+        const qItem = currentItem();
+        const qDeck = qItem._deck || state.deck;
+        Progress.record(`${qDeck}:${qItem.id}`, qDeck, knewIt);
+      }
       if (knewIt) state.session.correct++;
       else {
         state.session.wrong++;
@@ -302,7 +315,10 @@ function renderReadingQuiz(el) {
     (id, deck, knewIt) => {
       Progress.record(id, deck, knewIt);
       if (knewIt) state.session.correct++;
-      else state.session.wrong++;
+      else {
+        state.session.wrong++;
+        state.session.wrongItems.push({ ...passage, _deck: "reading" });
+      }
     },
     () => { state.readingQIndex += 1; render(); },
     () => nextCard()
@@ -355,14 +371,18 @@ function renderSummary() {
       ` : ""}
       <div class="summary-actions">
         <button class="start-btn" id="summary-again-btn">Study again</button>
-        ${wrongItems && wrongItems.length ? `<button class="start-btn drill-btn" id="summary-drill-btn">🔁 Drill missed (${wrongItems.length})</button>` : ""}
+        ${wrongItems && wrongItems.length ? `<button class="btn-secondary drill-btn" id="summary-drill-btn">🔁 Drill missed (${wrongItems.length})</button>` : ""}
         <button class="btn-secondary" id="summary-menu-btn">← Back to menu</button>
         <button class="dash-link" id="summary-dash-btn">📊 Dashboard</button>
       </div>
     </div>
   `;
 
-  document.getElementById("summary-again-btn").onclick = () => startSession();
+  document.getElementById("summary-again-btn").onclick = () => {
+    // Restore original session deck (drill mutates state.deck)
+    if (state._sessionDeck) state.deck = state._sessionDeck;
+    startSession();
+  };
   document.getElementById("summary-menu-btn").onclick = () => { state.view = "home"; render(); };
   document.getElementById("summary-dash-btn").onclick = () => { state.view = "dashboard"; render(); };
   const drillBtn = document.getElementById("summary-drill-btn");
