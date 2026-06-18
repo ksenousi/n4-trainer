@@ -130,6 +130,12 @@ button {
   transition: opacity 0.15s;
 }
 .start-btn:hover { opacity: 0.88; }
+.focus-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: -2px;
+  margin-bottom: 4px;
+}
 .dash-link {
   margin-top: 4px;
   background: transparent;
@@ -139,6 +145,7 @@ button {
   cursor: pointer;
   font-family: inherit;
   padding: 10px 14px;
+  min-height: 44px;
   border-radius: 8px;
   align-self: stretch;
   text-align: center;
@@ -267,6 +274,10 @@ button {
   padding-left: 16px;
   font-size: 14px;
   line-height: 1.7;
+}
+.wrong-items-list li {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .wi-hint { color: var(--text-dim); font-size: 13px; }
 .drill-btn {
@@ -404,6 +415,9 @@ button {
   font-weight: 600;
 }
 .reveal-area { margin-top: 16px; }
+.answer-feedback { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+.feedback-correct { color: var(--green); }
+.feedback-incorrect { color: var(--red); }
 .next-area {
   width: 100%;
   max-width: 420px;

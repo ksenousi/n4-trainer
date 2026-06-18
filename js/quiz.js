@@ -188,7 +188,12 @@ function renderChoiceQuiz(container, question, onRecord, onNext) {
         else if (bIdx === idx) b.classList.add("incorrect");
         b.disabled = true;
       });
-      container.querySelector(".reveal-area").style.display = "block";
+      const feedback = correct
+        ? `<div class="answer-feedback feedback-correct">Correct!</div>`
+        : `<div class="answer-feedback feedback-incorrect">Incorrect</div>`;
+      const revealEl = container.querySelector(".reveal-area");
+      revealEl.innerHTML = feedback + question.revealHtml;
+      revealEl.style.display = "block";
       container.querySelector(".next-area").style.display = "block";
       if (question.cardId) onRecord(question.cardId, question.deck, correct);
       document.getElementById("quiz-next-btn").onclick = onNext;
@@ -238,11 +243,12 @@ function renderReadingPassage(container, passage, qIndex, onRecord, onNextQuesti
         else if (bIdx === idx) b.classList.add("incorrect");
         b.disabled = true;
       });
-      if (isLast) {
-        const revealArea = container.querySelector(".reveal-area");
-        revealArea.style.display = "block";
-        revealArea.innerHTML = `<div class="example-translation">${passage.translation}</div>`;
-      }
+      const revealArea = container.querySelector(".reveal-area");
+      const feedback = correct
+        ? `<div class="answer-feedback feedback-correct">Correct!</div>`
+        : `<div class="answer-feedback feedback-incorrect">Incorrect</div>`;
+      revealArea.innerHTML = feedback + (isLast ? `<div class="example-translation">${passage.translation}</div>` : "");
+      revealArea.style.display = "block";
       container.querySelector(".next-area").style.display = "block";
       onRecord(`reading:${question.id}`, "reading", correct);
       document.getElementById("reading-next-btn").onclick = isLast ? onNextPassage : onNextQuestion;

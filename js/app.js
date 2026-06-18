@@ -167,6 +167,7 @@ function renderHome() {
           <button class="option-pill${state.filterMode === f.id ? " active" : ""}${state.deck === "mix" || state.deck === "reading" ? " disabled-pill" : ""}" data-filter="${f.id}" ${state.deck === "mix" || state.deck === "reading" ? "disabled" : ""}>${f.label}</button>
         `).join("")}
       </div>
+      <div class="focus-hint">Unknown = never studied &nbsp;·&nbsp; Weak = lowest accuracy</div>
 
       <div class="home-section-label">Session length</div>
       <div class="pill-row" id="size-pills">
@@ -324,7 +325,7 @@ function renderSummary() {
   const { correct, wrong, wrongItems } = state.session;
   const total = correct + wrong;
   const pct = total ? Math.round((correct / total) * 100) : 0;
-  const deckLabel = DECKS[state.deck]?.label ?? state.deck;
+  const deckLabel = DECKS[state._sessionDeck ?? state.deck]?.label ?? (state._sessionDeck ?? state.deck);
 
   let emoji = pct >= 80 ? "🎉" : pct >= 60 ? "💪" : "📖";
   let message = pct >= 80 ? "Great work!" : pct >= 60 ? "Keep it up!" : "Keep studying!";
