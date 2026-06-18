@@ -14,8 +14,8 @@ const DECKS = {
 
 // Quiz styles randomly mixed per card within each deck.
 const DECK_QUIZ_TYPES = {
-  vocab:        ["quiz-kana2kanji", "quiz-fillblank", "quiz-meaning"],
-  kanji:        ["quiz-kana2kanji", "quiz-fillblank", "quiz-meaning"],
+  vocab:        ["quiz-kana2kanji", "quiz-meaning"],
+  kanji:        ["quiz-kana2kanji", "quiz-meaning"],
   grammar:      ["quiz-cloze", "sentencecomp"],
   reading:      ["reading-quiz"],
   sentencecomp: ["sentencecomp"],
